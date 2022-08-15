@@ -1,45 +1,11 @@
-import { useCallback } from "react";
-import { trpc } from "../utils/trpc";
-
 export default function IndexPage() {
-  const addUserMutation = trpc.useMutation(["user.addUser"]);
-  const deleteUserMutation = trpc.useMutation(["user.deleteUser"]);
-  const usersQuery = trpc.useQuery(["user.getUsers"]);
-
-  const handleDelete = useCallback(async (id: string) => {
-    await deleteUserMutation.mutateAsync(
-      { id },
-      {
-        onSuccess: () => {
-          usersQuery.refetch();
-        },
-      }
-    );
-  }, []);
-
-  const handleAdd = useCallback(async () => {
-    const email = `${(Math.random() + 1).toString(36).substring(2)}@test.com`;
-    const password = "password";
-
-    await addUserMutation.mutateAsync(
-      { email, password },
-      {
-        onSuccess: () => {
-          usersQuery.refetch();
-        },
-      }
-    );
-  }, []);
-
-  if (usersQuery.isLoading) {
-    return <div>Loading...</div>;
-  }
+  const usersQuery = {
+    data: [{ id: "afbn4r324t2kj", email: "dupa@gorrion.io" }],
+  };
 
   return (
     <div>
-      <div>
-        <button onClick={handleAdd}>Add random</button>
-      </div>
+      <button onClick={() => {}}>Add</button>
       {usersQuery.data && (
         <ol>
           {usersQuery.data.map((u) => (
@@ -48,7 +14,7 @@ export default function IndexPage() {
                 <span>
                   {u.email} - {u.id}
                 </span>
-                <button onClick={() => handleDelete(u.id)}>Delete</button>
+                <button onClick={() => {}}>Delete</button>
               </div>
             </li>
           ))}
