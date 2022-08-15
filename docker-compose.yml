@@ -1,0 +1,44 @@
+version: "3.7"
+
+services:
+  app:
+    restart: unless-stopped
+    container_name: demo-app
+    image: node:16-bullseye-slim
+    networks:
+      - network
+    volumes:
+      - ".:/usr/app"
+      - "root_node_modules:/usr/app/node_modules"
+      - "api_node_modules:/usr/app/apps/api/node_modules"
+      - "web_node_modules:/usr/app/apps/web/node_modules"
+    working_dir: /usr/app
+    command: sh -c "apt-get update -y && apt-get install openssl procps -y && yarn && yarn prisma generate --schema=./apps/api/prisma/schema.prisma && yarn prisma migrate deploy --schema=./apps/api/prisma/schema.prisma && yarn --cwd=./apps/api db:seed && yarn dev"
+    ports:
+      - "4000:4000"
+      - "3000:3000"
+    depends_on:
+      - db
+    env_file:
+      - .env
+
+  db:
+    container_name: demo-db
+    image: postgres:14.2-bullseye
+    networks:
+      - network
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: Asd123
+      POSTGRES_DB: demo
+    ports:
+      - "5432:5432"
+
+volumes:
+  web_node_modules:
+  api_node_modules:
+  root_node_modules:
+
+networks:
+  network:
+    driver: bridge
